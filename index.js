@@ -1,4 +1,4 @@
-const { prefix: PRE, token } = require('./config.json');
+const { prefix: PRE, token: TOKEN } = require('./config.json');
 const discord = require('discord.js');
 const fs = require('fs');
 
@@ -10,23 +10,55 @@ const cmdFiles = fs
 	.readdirSync('./cmds/')
 	.filter((file) => file.endsWith('.js'));
 
+for (const file of cmdFiles) {
+	let newCmd = require(`./cmds/${file}`);
+	client.commands.set(newCmd.name, newCmd);
+}
+
+let help = cmdFiles
+	.map((x) => {
+		let temp = x.split('.');
+		temp = temp[0].toString();
+
+		let test = client.commands.get(temp);
+
+		return `   ${PRE}${test.name} - ${test.description}\n`;
+	})
+	.join('');
+
+console.log(help);
+
+console.log(cmdFiles);
+
 client.once('ready', () => {
 	console.log('Bot online!');
 });
 
-client.on('message', async (message) => {
+client.on('message', (message) => {
 	if (!message.content.startsWith(PRE) || message.author.bot) return;
-
 	const args = message.content.slice(PRE.length).split(' ');
-	const command = args[0].toLowerCase();
+	const commandName = args.shift().toLowerCase();
 
-	for (nc of cmdFiles) {
-		if (nc.startsWith(command)) {
-			let newCmd = require(`./cmds/${command}.js`);
-			client.commands.set(newCmd.name, newCmd);
-			await client.commands.get(command).execute(message, args);
-		}
+	if (commandName === 'help') {
+		message.channel.send(`Bot Commands: \n\`\`\`${help}\`\`\``);
+		return;
+	}
+
+	if (!client.commands.has(commandName)) return;
+	const command = client.commands.get(commandName);
+
+	if (command.guildOnly && message.channel.type !== 'text') {
+		return message.reply("I can't execute that command inside DMs!");
+	}
+
+	// console.log(client.commands);
+
+	try {
+		command.execute(message, args);
+	} catch (error) {
+		console.error(error);
+		message.reply(`'\$${command}' is not a command`);
 	}
 });
 
-client.login(token);
+client.login(TOKEN);
