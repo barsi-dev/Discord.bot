@@ -48,7 +48,15 @@ client.on('message', (message) => {
 	const command = client.commands.get(commandName);
 
 	if (command.guildOnly && message.channel.type !== 'text') {
-		return message.reply("I can't execute that command inside DMs!");
+		return message.channel.send(
+			`I can't execute that command inside DMs, ${message.author}!`
+		);
+	}
+
+	if (command.dmOnly && message.channel.type !== 'dm') {
+		return message.channel.send(
+			`I'm sorry. You must DM the bot for that command to work, ${message.author}`
+		);
 	}
 
 	// console.log(client.commands);
