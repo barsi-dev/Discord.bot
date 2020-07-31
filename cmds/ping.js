@@ -3,6 +3,6 @@ module.exports = {
 	description: 'This is a ping command!',
 	guildOnly: true,
 	execute(message, args) {
-		message.channel.send('pong!');
+		message.reply('pong!').then((r) => r.delete({ timeout: 5000 }));
 	},
 };

@@ -21,14 +21,9 @@ let help = cmdFiles
 		temp = temp[0].toString();
 
 		let test = client.commands.get(temp);
-
 		return `   ${PRE}${test.name} - ${test.description}\n`;
 	})
 	.join('');
-
-console.log(help);
-
-console.log(cmdFiles);
 
 client.once('ready', () => {
 	console.log('Bot online!');
