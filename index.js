@@ -54,7 +54,12 @@ client.on('message', (message) => {
 		);
 	}
 
-	// console.log(client.commands);
+	if (command.minArgs) {
+		if (args.length < command.minArgs)
+			return message.channel.send(
+				`Not enough arguments for command ${commandName}`
+			);
+	}
 
 	try {
 		command.execute(message, args);
