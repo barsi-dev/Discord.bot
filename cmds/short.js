@@ -8,25 +8,32 @@ module.exports = {
 	description: 'Generates a short URL to your longURL',
 	usage: '/short <longURL> <slug>',
 	execute(message, args) {
-		if (args[0] === 'help') {
-			message.delete({ timeout: 5000 });
+		if (!args[0]) {
+			message.delete({ timeout: 10000 });
 			return message.channel
 				.send(`\`\`\`${this.usage}\`\`\``)
-				.then((msg) => msg.delete({ timeout: 5000 }));
+				.then((msg) => msg.delete({ timeout: 10000 }));
+		}
+
+		if (args[0] === 'help') {
+			message.delete({ timeout: 10000 });
+			return message.channel
+				.send(`\`\`\`${this.usage}\`\`\``)
+				.then((msg) => msg.delete({ timeout: 10000 }));
 		}
 
 		if (cooldown.has(message.author.id)) {
-			message.delete({ timeout: 5000 });
+			message.delete({ timeout: 10000 });
 			return message.channel
 				.send('```You have to wait 1 minute between short-url creation```')
-				.then((msg) => msg.delete({ timeout: 5000 }));
+				.then((msg) => msg.delete({ timeout: 10000 }));
 		}
 
 		if (!validUrl.isUri(args[0])) {
-			message.delete({ timeout: 5000 });
+			message.delete({ timeout: 10000 });
 			return message.channel
 				.send('```Not a valid URL```')
-				.then((msg) => msg.delete({ timeout: 5000 }));
+				.then((msg) => msg.delete({ timeout: 10000 }));
 		}
 
 		let options = {
@@ -41,24 +48,25 @@ module.exports = {
 			if (error) throw new Error(error);
 
 			if (body.res) {
-				message.delete({ timeout: 5000 });
+				message.delete({ timeout: 10000 });
 				return message.channel
 					.send(`\`\`\`${body.res}\`\`\``)
-					.then((msg) => msg.delete({ timeout: 5000 }));
+					.then((msg) => msg.delete({ timeout: 10000 }));
 			}
 
 			if (response.statusCode === 429) {
+				message.delete({ timeout: 10000 });
 				return message.channel
 					.send(
 						'```You tried to create too many links.\nTry again in a few mins```'
 					)
-					.then((msg) => msg.delete({ timeout: 5000 }));
+					.then((msg) => msg.delete({ timeout: 10000 }));
 			}
 
-			message.delete({ timeout: 5000 });
+			message.delete({ timeout: 10000 });
 			message.channel
 				.send(`\`\`\`${body.shortUrl}\`\`\``)
-				.then((msg) => msg.delete({ timeout: 5000 }));
+				.then((msg) => msg.delete({ timeout: 10000 }));
 
 			cooldown.add(message.author.id);
 
