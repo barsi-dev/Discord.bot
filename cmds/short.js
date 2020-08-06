@@ -8,14 +8,7 @@ module.exports = {
 	description: 'Generates a short URL to your longURL',
 	usage: '/short <longURL> <slug>',
 	execute(message, args) {
-		if (!args[0]) {
-			message.delete({ timeout: 10000 });
-			return message.channel
-				.send(`\`\`\`${this.usage}\`\`\``)
-				.then((msg) => msg.delete({ timeout: 10000 }));
-		}
-
-		if (args[0] === 'help') {
+		if (!args[0] || args[0] === 'help') {
 			message.delete({ timeout: 10000 });
 			return message.channel
 				.send(`\`\`\`${this.usage}\`\`\``)
@@ -47,6 +40,7 @@ module.exports = {
 		request(options, function (error, response, body) {
 			if (error) throw new Error(error);
 
+			// If slug exists, body.res is populated
 			if (body.res) {
 				message.delete({ timeout: 10000 });
 				return message.channel
@@ -54,6 +48,7 @@ module.exports = {
 					.then((msg) => msg.delete({ timeout: 10000 }));
 			}
 
+			// (429) Rate Limiting -- Too many request
 			if (response.statusCode === 429) {
 				message.delete({ timeout: 10000 });
 				return message.channel
