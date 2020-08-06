@@ -1,5 +1,4 @@
 const { prefix: PRE, token: TOKEN } = require('./config.json');
-
 const discord = require('discord.js');
 const fs = require('fs');
 
