@@ -9,21 +9,21 @@ module.exports = {
 	usage: '/short <longURL> <slug>',
 	execute(message, args) {
 		if (!args[0] || args[0] === 'help') {
-			message.delete({ timeout: 10000 });
+			message.delete({ timeout: 10000 }).catch((err) => console.error(err));
 			return message.channel
 				.send(`\`\`\`${this.usage}\`\`\``)
 				.then((msg) => msg.delete({ timeout: 10000 }));
 		}
 
 		if (cooldown.has(message.author.id)) {
-			message.delete({ timeout: 10000 });
+			message.delete({ timeout: 10000 }).catch((err) => console.error(err));
 			return message.channel
 				.send('```You have to wait 1 minute between short-url creation```')
 				.then((msg) => msg.delete({ timeout: 10000 }));
 		}
 
 		if (!validUrl.isUri(args[0])) {
-			message.delete({ timeout: 10000 });
+			message.delete({ timeout: 10000 }).catch((err) => console.error(err));
 			return message.channel
 				.send('```Not a valid URL```')
 				.then((msg) => msg.delete({ timeout: 10000 }));
@@ -31,7 +31,7 @@ module.exports = {
 
 		let options = {
 			method: 'POST',
-			url: 'https://barsi.me/api/url/shorten',
+			url: 'https://url.barsi.me/api/url/shorten',
 			headers: { 'Content-Type': 'application/json' },
 			body: { longUrl: args[0], slug: args[1] },
 			json: true,
@@ -42,7 +42,7 @@ module.exports = {
 
 			// If slug exists, body.res is populated
 			if (body.res) {
-				message.delete({ timeout: 10000 });
+				message.delete({ timeout: 10000 }).catch((err) => console.error(err));
 				return message.channel
 					.send(`\`\`\`${body.res}\`\`\``)
 					.then((msg) => msg.delete({ timeout: 10000 }));
@@ -50,7 +50,7 @@ module.exports = {
 
 			// (429) Rate Limiting -- Too many request
 			if (response.statusCode === 429) {
-				message.delete({ timeout: 10000 });
+				message.delete({ timeout: 10000 }).catch((err) => console.error(err));
 				return message.channel
 					.send(
 						'```You tried to create too many links.\nTry again in a few mins```'
@@ -58,7 +58,7 @@ module.exports = {
 					.then((msg) => msg.delete({ timeout: 10000 }));
 			}
 
-			message.delete({ timeout: 10000 });
+			message.delete({ timeout: 10000 }).catch((err) => console.error(err));
 			message.channel
 				.send(`\`\`\`${body.shortUrl}\`\`\``)
 				.then((msg) => msg.delete({ timeout: 10000 }));
